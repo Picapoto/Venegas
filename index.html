@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Fondos - Dashboard Financiero</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-title">
+                <i class="fa-solid fa-chart-pie"></i>
+                <h1>Explorador de Fondos</h1>
+            </div>
+            <div class="header-actions">
+                <div class="fund-selector-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="fund-selector" list="fund-list" placeholder="Buscar fondo..." autocomplete="off">
+                    <datalist id="fund-list"></datalist>
+                </div>
+                <button id="btn-import" class="btn btn-secondary"><i class="fa-solid fa-upload"></i> Importar Excel</button>
+                <input type="file" id="file-import" accept=".csv, .xlsx, .xls" style="display: none;">
+
+                <button id="btn-clear-all" class="btn btn-danger" title="Borrar base de datos"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="dashboard-tabs">
+            <button class="tab-btn active" data-tab="individual"><i class="fa-solid fa-chart-line"></i> Explorador Individual</button>
+            <button class="tab-btn" data-tab="comparison"><i class="fa-solid fa-code-compare"></i> Comparador de Fondos</button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state">
+            <i class="fa-solid fa-arrow-pointer empty-icon"></i>
+            <h2>Selecciona un fondo para comenzar</h2>
+            <p>Usa el buscador superior para seleccionar un fondo, o importa un archivo Excel para cargar la base de datos.</p>
+        </div>
+
+        <!-- Main Content -->
+        <main class="dashboard-main" id="main-content" style="display: none;">
+            <!-- Fund Header -->
+            <section class="fund-header-section">
+                <h2 id="display-fund-name">Nombre del Fondo</h2>
+                <span id="display-fund-class" class="badge neutral classification-badge">Clasificación</span>
+            </section>
+
+            <!-- Top Stats -->
+            <section class="stats-section" id="dynamic-stats">
+                <!-- Tarjetas generadas dinámicamente -->
+            </section>
+
+            <!-- Charts Section -->
+            <div class="chart-filters">
+                <span class="filter-label"><i class="fa-solid fa-calendar-days"></i> Rango del gráfico:</span>
+                <div class="filter-buttons">
+                    <button class="btn-filter active" data-range="all">Todo</button>
+                    <button class="btn-filter" data-range="1m">1M</button>
+                    <button class="btn-filter" data-range="3m">3M</button>
+                    <button class="btn-filter" data-range="6m">6M</button>
+                    <button class="btn-filter" data-range="ytd">YTD</button>
+                    <button class="btn-filter" data-range="1y">1A</button>
+                </div>
+            </div>
+            <section class="charts-section" id="charts-container">
+                <!-- Gráficos generados dinámicamente -->
+            </section>
+
+            <!-- Data Section -->
+            <section class="data-section">
+                <!-- Table -->
+                <div class="table-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-table"></i> Historial de Registros</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="records-table">
+                            <thead id="table-head">
+                                <!-- Cabeceras generadas dinámicamente -->
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Filas generadas dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="base-date-info" style="margin-top: 1rem;">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <p>El porcentaje de variación se calcula tomando como base la <strong>primera fecha disponible</strong> de este fondo.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Comparison Content -->
+        <main class="dashboard-main" id="comparison-content" style="display: none;">
+            <div class="comparison-layout">
+                <!-- Sidebar: selection of funds and currency -->
+                <aside class="comparison-sidebar">
+                    <div class="sidebar-card">
+                        <h3><i class="fa-solid fa-filter"></i> Opciones</h3>
+                        
+                        <div class="form-group">
+                            <label>Moneda a Comparar</label>
+                            <div class="currency-selector-buttons" id="comparison-currency-selector">
+                                <!-- Habilitado dinámicamente -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Seleccionar Fondos</label>
+                            <div class="fund-search-wrapper">
+                                <input type="text" id="comparison-fund-search" class="fund-search-input" placeholder="🔍 Buscar fondo...">
+                            </div>
+                            <div class="funds-checkbox-list" id="comparison-funds-list">
+                                <!-- Listado de fondos dinámico -->
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Comparison Main Area -->
+                <div class="comparison-main-area">
+                    <!-- Comparison Empty State -->
+                    <div id="comparison-empty-state" class="empty-state" style="display: flex; padding: 4rem 2rem; border-radius: var(--radius-lg);">
+                        <i class="fa-solid fa-code-compare empty-icon"></i>
+                        <h2>Selecciona fondos para comparar</h2>
+                        <p>Marca las casillas en el panel lateral izquierdo y elige una moneda para visualizar la comparación.</p>
+                    </div>
+
+                    <!-- Comparison Results -->
+                    <div id="comparison-results" style="display: none; width: 100%;">
+                        <!-- Range Filters and Title -->
+                        <div class="comparison-header-row">
+                            <h2 class="comparison-title" id="comparison-chart-title">Comparación de Rendimiento (%)</h2>
+                            <div class="chart-filters comparison-filters" style="margin-bottom: 0;">
+                                <span class="filter-label"><i class="fa-solid fa-calendar-days"></i> Rango:</span>
+                                <div class="filter-buttons">
+                                    <button class="btn-filter-comp active" data-range="all">Todo</button>
+                                    <button class="btn-filter-comp" data-range="1m">1M</button>
+                                    <button class="btn-filter-comp" data-range="3m">3M</button>
+                                    <button class="btn-filter-comp" data-range="6m">6M</button>
+                                    <button class="btn-filter-comp" data-range="ytd">YTD</button>
+                                    <button class="btn-filter-comp" data-range="1y">1A</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart Card -->
+                        <div class="chart-card comparison-chart-card">
+                            <div class="chart-container" style="height: 400px; margin-bottom: 0;">
+                                <canvas id="comparison-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Yearly Returns Section -->
+                        <div id="comparison-yearly-returns" class="yearly-returns-section"></div>
+
+                        <!-- Stats Table Card -->
+                        <div class="table-card comparison-table-card" style="margin-top: 1.5rem;">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-table"></i> Estadísticas Comparativas</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr id="comparison-table-head">
+                                            <th>Fondo</th>
+                                            <th>Rendimiento Actual</th>
+                                            <th>Último Valor Cuota</th>
+                                            <th>Máx Histórico</th>
+                                            <th>Mín Histórico</th>
+                                            <th>Última Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="comparison-table-body">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SheetJS (Excel) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
